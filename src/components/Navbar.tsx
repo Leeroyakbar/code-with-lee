@@ -1,15 +1,18 @@
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
+import { Menu, X } from "lucide-react"
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  // Efek untuk mengubah tampilan navbar saat di-scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50)
     }
+
     window.addEventListener("scroll", handleScroll)
+
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -26,12 +29,12 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: "circOut" }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 px-6 lg:px-24 py-6 ${scrolled ? "bg-background-light/80 backdrop-blur-md py-4 border-b border-primary/5" : "bg-transparent"}`}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 px-6 lg:px-24 ${scrolled ? "bg-background-light/80 backdrop-blur-md py-4 border-b border-primary/5" : "bg-transparent py-6"}`}
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Logo / Brand */}
-        <a href="#" className="text-xl font-bold tracking-tightest">
-          CodeWith<span className="text-secondary">LEE.</span>
+        {/* Logo */}
+        <a href="#home" className="text-xl font-bold tracking-tight">
+          CodeWith<span className="text-secondary">Lee.</span>
         </a>
 
         {/* Desktop Menu */}
@@ -42,15 +45,35 @@ const Navbar = () => {
             </a>
           ))}
 
-          {/* Resume / CTA Button */}
-          <a href="#contact" className="px-5 py-2 bg-primary text-accent text-xs font-bold uppercase tracking-widest rounded-full hover:bg-secondary transition-all duration-300">
+          <a href="#contact" className="px-5 py-2 bg-primary text-white text-xs font-bold uppercase tracking-widest rounded-full hover:bg-secondary transition-all duration-300">
             Hire Me
           </a>
         </div>
 
-        {/* Mobile Menu Icon (Placeholder for now) */}
-        <div className="md:hidden text-primary font-bold">MENU</div>
+        {/* Mobile Toggle */}
+        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.25 }} className="md:hidden mt-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+            <div className="flex flex-col p-6 gap-6">
+              {navLinks.map((link) => (
+                <a key={link.name} href={link.href} onClick={() => setMobileOpen(false)} className="text-sm font-medium text-secondary hover:text-primary transition">
+                  {link.name}
+                </a>
+              ))}
+
+              <a href="#contact" onClick={() => setMobileOpen(false)} className="mt-4 px-5 py-3 bg-primary text-white text-sm font-semibold rounded-full text-center">
+                Hire Me
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   )
 }
